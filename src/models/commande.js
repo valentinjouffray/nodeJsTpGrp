@@ -12,7 +12,16 @@ const Commande = db.define("Commande", {
     },
   },
   date: { type: DataTypes.DATE },
-  status: { type: DataTypes.STRING, allowNull: false },
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      isIn: {
+        args: [['EN COURS', 'TERMINE']],
+        msg: "Status must be either 'EN COURS' or 'TERMINE'"
+      }
+    }
+  }
 });
 
 Bar.hasMany(Commande, {
