@@ -1,6 +1,5 @@
 const db = require("../config/database");
 const { DataTypes } = require("sequelize");
-const Commande = require("./commande");
 
 const Bar = db.define("Bar", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },

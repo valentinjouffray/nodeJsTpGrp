@@ -15,13 +15,6 @@ const Commande = db.define("Commande", {
   status: { type: DataTypes.STRING, allowNull: false },
 });
 
-// Bar.hasMany(Commande, {
-//   foreignKey: {
-//     name: "barId",
-//     allowNull: false,
-//   },
-//   onDelete: "CASCADE",
-// });
 Bar.hasMany(Commande, {
   foreignKey: {
     name: "barId",
