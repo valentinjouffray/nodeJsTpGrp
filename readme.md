@@ -97,16 +97,16 @@ package.json
 - supertest (optionnel, pour les tests)
 
 ## Liste des contraintes sur mes routes et models :
-- Tous les champs obligatoires doivent être renseignés
-- Le nom d'un bar doit être unique
-- Le prix d'une bière doit être positif
-- Le prix d'une commande doit être positif
-- Le statut d'une commande doit être "en cours" ou "terminée"
-- Une commande ne peut pas être modifiée si elle est terminée
-- La date d'une commande ne peut pas être supérieure à la date du jour
-- Quand je supprime un bar, je supprime toutes les bières et les commandes associées
-- Quand je supprime une bière, je supprime toutes les commandes associées
-- Quand je supprime une commande, je supprime toutes les biere_commande associées
+- [x] Tous les champs obligatoires doivent être renseignés
+- [x] Le nom d'un bar doit être unique
+- [x] Le prix d'une bière doit être positif
+- [x] Le prix d'une commande doit être positif
+- [x] Le statut d'une commande doit être "en cours" ou "terminée"
+- [x] Une commande ne peut pas être modifiée si elle est terminée
+- [x] La date d'une commande ne peut pas être supérieure à la date du jour
+- [x] Quand je supprime un bar, je supprime toutes les bières et les commandes associées
+- [x] Quand je supprime une bière, je supprime toutes les commandes associées
+- [x] Quand je supprime une commande, je supprime toutes les biere_commande associées
 
 ## Les endpoints avancés
 GET /bars/:id_bar/degree?prix_min=10&prix_max=20 => Degré d'alcool moyen des bières d'un bar avec un prix compris entre 10 et 20
