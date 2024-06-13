@@ -16,5 +16,12 @@ const Biere = db.define("Biere", {
     },
   },
 });
+Bar.hasMany(Biere, {
+  foreignKey: {
+    name: "barId",
+    allowNull: false,
+  },
+  onDelete: "CASCADE",
+});
 
 module.exports = Biere;

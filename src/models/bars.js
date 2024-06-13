@@ -1,6 +1,5 @@
 const db = require("../config/database");
 const { DataTypes } = require("sequelize");
-const Biere = require("./biere");
 const Commande = require("./commande");
 
 const Bar = db.define("Bar", {
@@ -10,22 +9,6 @@ const Bar = db.define("Bar", {
   tel: { type: DataTypes.STRING, allowNull: true },
   email: { type: DataTypes.STRING, allowNull: false },
   description: { type: DataTypes.STRING, allowNull: true },
-});
-
-Bar.hasMany(Biere, {
-  foreignKey: {
-    name: "barId",
-    allowNull: false,
-  },
-  onDelete: "CASCADE",
-});
-
-Bar.hasMany(Commande, {
-  foreignKey: {
-    name: "barId",
-    allowNull: false,
-  },
-  onDelete: "CASCADE",
 });
 
 module.exports = Bar;
