@@ -1,8 +1,12 @@
 const barController = require("../controllers/barsController");
 
 const express = require("express");
-const router = express.Router();
+const barRouter = express.Router();
 
-const barRouter = router.get("/", barController.getAll);
+barRouter.get("/", barController.getAll);
+barRouter.post("/", barController.create);
+barRouter.put("/:id", barController.update);
+barRouter.delete("/:id", barController.delete);
+barRouter.get("/:id", barController.getById);
 
 module.exports = barRouter;
