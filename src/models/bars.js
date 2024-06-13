@@ -1,6 +1,7 @@
 const db = require("../config/database");
 const { DataTypes } = require("sequelize");
 const Biere = require("./biere");
+const Commande = require("./commande");
 
 const Bar = db.define("Bar", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -12,11 +13,19 @@ const Bar = db.define("Bar", {
 });
 
 Bar.hasMany(Biere, {
-    foreignKey: {
-        name: "barId",
-        allowNull: false,
-    },
-    onDelete: "CASCADE",
-})
+  foreignKey: {
+    name: "barId",
+    allowNull: false,
+  },
+  onDelete: "CASCADE",
+});
+
+Bar.hasMany(Commande, {
+  foreignKey: {
+    name: "barId",
+    allowNull: false,
+  },
+  onDelete: "CASCADE",
+});
 
 module.exports = Bar;
