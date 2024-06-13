@@ -75,7 +75,7 @@ commandeController.update = (req, res) => {
     });
 };
 
-controller.delete = (req, res) => {
+commandeController.delete = (req, res) => {
   const id = req.params.id;
 
   Commande.destroy({ where: { id } })
