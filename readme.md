@@ -101,7 +101,7 @@ package.json
 - [x] Le nom d'un bar doit être unique
 - [x] Le prix d'une bière doit être positif
 - [x] Le prix d'une commande doit être positif
-- [ ] Le statut d'une commande doit être "en cours" ou "terminée"
+- [x] Le statut d'une commande doit être "en cours" ou "terminée"
 - [ ] Une commande ne peut pas être modifiée si elle est terminée
 - [ ] La date d'une commande ne peut pas être supérieure à la date du jour
 - [x] Quand je supprime un bar, je supprime toutes les bières et les commandes associées
