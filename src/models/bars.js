@@ -6,7 +6,13 @@ const Bar = db.define("Bar", {
   name: { type: DataTypes.STRING, allowNull: false, unique: true },
   adresse: { type: DataTypes.STRING, allowNull: false },
   tel: { type: DataTypes.STRING, allowNull: true },
-  email: { type: DataTypes.STRING, allowNull: false },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      isEmail: true,
+    },
+  },
   description: { type: DataTypes.STRING, allowNull: true },
 });
 
