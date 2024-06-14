@@ -127,10 +127,27 @@ barController.getByCity = (req, res) => {
 };
 
 // GET /bars/:id_bar/biere => Liste des bières d'un bar
+//GET /bars/:id_bar/biere?sort=asc => Liste des bières d'un bar triées par ordre alphabétique
 barController.getBieresByBarId = (req, res) => {
   const barId = req.params.id_bar;
+  const sort = req.query.sort;
 
-  Biere.findAll({ where: { barId: barId } })
+  if (sort && sort !== "asc") {
+    return res
+      .status(400)
+      .json({ message: "Invalid sort parameter. Use 'asc'." });
+  }
+
+  let orderCondition = [];
+
+  if (sort) {
+    orderCondition = [["name", sort]];
+  }
+
+  Biere.findAll({
+    where: { barId: barId },
+    order: orderCondition,
+  })
     .then((bieres) => {
       if (bieres.length === 0) {
         return res
@@ -140,28 +157,42 @@ barController.getBieresByBarId = (req, res) => {
       res.status(200).json(bieres);
     })
     .catch((error) => {
-      res
-        .status(500)
-        .json({
-          message: "Failed to fetch biere for the specified bar",
-          error,
-        });
+      res.status(500).json({
+        message: "Failed to fetch biere for the specified bar",
+        error,
+      });
     });
 };
 
 //GET /bars/:id_bar/degree => Degré d'alcool moyen des bières d'un bar
 //GET /bars/:id_bar/degree?prix_min=10&prix_max=20 => Degré d'alcool moyen des bières d'un bar avec un prix compris entre 10 et 20
 //Get /:id_bar/degree?date=2021-01-01
+
 barController.getAverageDegreeByBarId = (req, res) => {
   const barId = req.params.id_bar;
   const date = req.query.date;
   const prixMin = req.query.prix_min;
   const prixMax = req.query.prix_max;
 
+  // Validation des paramètres de requête
+  const isValidDate = date && !isNaN(new Date(date).getTime());
+  const isValidPriceRange =
+    prixMin &&
+    prixMax &&
+    !isNaN(parseFloat(prixMin)) &&
+    !isNaN(parseFloat(prixMax));
+
+  if (!isValidDate && !isValidPriceRange) {
+    return res.status(400).json({
+      message:
+        "Invalid query parameters. Use either 'date' or both 'prix_min' and 'prix_max'.",
+    });
+  }
+
   let whereCondition = { barId: barId };
 
   // Ajouter le filtre de date
-  if (date) {
+  if (isValidDate) {
     const startDate = new Date(date);
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 1);
@@ -173,14 +204,11 @@ barController.getAverageDegreeByBarId = (req, res) => {
   }
 
   // Ajouter les filtres de prix
-  if (prixMin) {
-    whereCondition.prix = whereCondition.prix || {};
-    whereCondition.prix[Op.gte] = parseFloat(prixMin);
-  }
-
-  if (prixMax) {
-    whereCondition.prix = whereCondition.prix || {};
-    whereCondition.prix[Op.lte] = parseFloat(prixMax);
+  if (isValidPriceRange) {
+    whereCondition.prix = {
+      [Op.gte]: parseFloat(prixMin),
+      [Op.lte]: parseFloat(prixMax),
+    };
   }
 
   Biere.findAll({ where: whereCondition })
@@ -197,13 +225,10 @@ barController.getAverageDegreeByBarId = (req, res) => {
       res.status(200).json({ averageDegree: averageDegree });
     })
     .catch((error) => {
-      res
-        .status(500)
-        .json({
-          message:
-            "Failed to calculate average degree for the specified filters",
-          error,
-        });
+      res.status(500).json({
+        message: "Failed to calculate average degree for the specified filters",
+        error,
+      });
     });
 };
 
