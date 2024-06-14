@@ -57,7 +57,7 @@ Création d'une API pour un site de bars qui permet de gérer les bars, les biè
 [ ]GET /bars/:id_bar/commandes?prix_min=10&prix_max=20 => Liste des commandes d'un bar avec un prix compris entre 10 et 20
 [ ] GET /bars?ville=Paris => Liste des bars d'une ville donnée
 [ ] GET /bars?name=example => Liste des bars dont le nom contient "example"
-[ ] GET /bars/:id_bar/degree => Degré d'alcool moyen des bières d'un bar
+[x] GET /bars/:id_bar/degree => Degré d'alcool moyen des bières d'un bar
 
 ## Liste des fichiers recommandés
 - models/
