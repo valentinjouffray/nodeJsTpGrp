@@ -28,11 +28,11 @@ commandeController.getById = (req, res) => {
 };
 
 commandeController.create = (req, res) => {
-  // if (!req.form.isValid) {
-  //   res.status(400).json({ message: "Invalid Form" });
-  // }
+  if (!req.form.isValid) {
+    res.status(400).json({ message: "Invalid Form", errors: req.form.errors });
+  }
 
-  const { prix, date, status, barId } = req.body;
+  const { prix, date, status, barId } = req.form;
   const commande = { prix, date, status, barId };
   if (new Date(commande.date) > new Date()) {
     res.status(400).send({ error: "Invalid date" });
@@ -51,8 +51,12 @@ commandeController.create = (req, res) => {
 };
 
 commandeController.update = async (req, res) => {
+  if (!req.form.isValid) {
+    res.status(400).json({ message: "Invalid Form", errors: req.form.errors });
+  }
+
   const id = req.params.id;
-  const { prix, date, status } = req.body;
+  const { prix, date, status } = req.form;
   const updatedData = { prix, date, status };
 
   try {

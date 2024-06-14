@@ -27,11 +27,11 @@ biereController.getById = (req, res) => {
 };
 
 biereController.create = (req, res) => {
-  // if (!req.form.isValid) {
-  //   res.status(400).json({ message: "Invalid Form" });
-  // }
+  if (!req.form.isValid) {
+    res.status(400).json({ message: "Invalid Form", errors: req.form.errors });
+  }
 
-  const { name, description, degree, prix, barId } = req.body;
+  const { name, description, degree, prix, barId } = req.form;
   const biere = { name, description, degree, prix, barId };
 
   Biere.create(biere)
@@ -47,12 +47,11 @@ biereController.create = (req, res) => {
 };
 
 biereController.update = (req, res) => {
-  // if (!req.form.isValid) {
-  //   res.status(400).json({ message: "Invalid Form" });
-  // }
-
+  if (!req.form.isValid) {
+    res.status(400).json({ message: "Invalid Form", errors: req.form.errors });
+  }
   const id = req.params.id;
-  const { name, description, degree, prix } = req.body;
+  const { name, description, degree, prix } = req.form;
   const biere = { name, description, degree, prix };
 
   Biere.update(biere, { where: { id } })
