@@ -53,11 +53,11 @@ Création d'une API pour un site de bars qui permet de gérer les bars, les biè
   DELETE /commandes/:id/biere/:id => Supprimer une bière d'une commande
   
 ## Liste des endpoints avancés
-[ ]GET /bars/:id_bar/commandes?date=2021-01-01 => Liste des commandes d'un bar à une date donnée
-[ ]GET /bars/:id_bar/commandes?prix_min=10&prix_max=20 => Liste des commandes d'un bar avec un prix compris entre 10 et 20
-[ ] GET /bars?ville=Paris => Liste des bars d'une ville donnée
-[ ] GET /bars?name=example => Liste des bars dont le nom contient "example"
-[x] GET /bars/:id_bar/degree => Degré d'alcool moyen des bières d'un bar
+- [ ]GET /bars/:id_bar/commandes?date=2021-01-01 => Liste des commandes d'un bar à une date donnée
+- [ ]GET /bars/:id_bar/commandes?prix_min=10&prix_max=20 => Liste des commandes d'un bar avec un prix compris entre 10 et 20
+- [ ] GET /bars?ville=Paris => Liste des bars d'une ville donnée
+- [ ] GET /bars?name=example => Liste des bars dont le nom contient "example"
+- [x] GET /bars/:id_bar/degree => Degré d'alcool moyen des bières d'un bar
 
 ## Liste des fichiers recommandés
 - models/
