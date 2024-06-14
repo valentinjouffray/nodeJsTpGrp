@@ -129,7 +129,8 @@ barController.getByCity = (req, res) => {
 //GET /bars/:id_bar/biere => Liste des bières d'un bar
 //GET /bars/:id_bar/biere?sort=asc => Liste des bières d'un bar triées par ordre alphabétique
 //GET /bars/:id_bar/biere?sort=desc => Liste des bières d'un bar triées par ordre alphabétique inversé
-//GET /bars/:id_bar/biere?sort=asc&limit=10 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10
+//GET /bars/:id_bar/biere?sort=asc&limit=10 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10 
+//GET /bars/:id_bar/biere?sort=asc&limit=10&offset=5 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10 en commençant à l'index 5 PAS TERMINE
 barController.getBieresByBarId = async (req, res) => {
   const barId = req.params.id_bar;
   const sort = req.query.sort;
@@ -228,6 +229,7 @@ barController.getBieresByBarId = async (req, res) => {
 //GET /bars/:id_bar/degree => Degré d'alcool moyen des bières d'un bar
 //GET /bars/:id_bar/degree?prix_min=10&prix_max=20 => Degré d'alcool moyen des bières d'un bar avec un prix compris entre 10 et 20
 //Get /:id_bar/degree?date=2021-01-01
+
 barController.getAverageDegreeByBarId = async (req, res) => {
   const { id_bar: barId } = req.params;
   const { date, prix_min: prixMin, prix_max: prixMax } = req.query;
