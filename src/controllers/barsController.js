@@ -132,10 +132,10 @@ barController.getBieresByBarId = (req, res) => {
   const barId = req.params.id_bar;
   const sort = req.query.sort;
 
-  if (sort && sort !== "asc") {
+  if (sort && sort !== "asc" && sort !== "desc") {
     return res
       .status(400)
-      .json({ message: "Invalid sort parameter. Use 'asc'." });
+      .json({ message: "Invalid sort parameter. Use 'asc' or 'desc'." });
   }
 
   let orderCondition = [];
