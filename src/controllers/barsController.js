@@ -1,15 +1,29 @@
 const Bar = require("../models/bars");
+const Commande = require("../models/commande");
+// const barsIndexMethodFinder = require("../services/barsIndexMethodFinder");
 const barController = {};
 
+// barController.index = (req, res) => {
+//   const { query } = req;
+//   const indexMethod = barsIndexMethodFinder(query);
+//   indexMethod(req, res);
+// };
+
 barController.getAll = (req, res) => {
-  Bar.findAll()
-    .then((bars) => {
-      res.json(bars);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
+  if (req.query) {
+    if (req.query.ville) {
+      barController.getByCity(req, res);
+    } else return res.status(400).json({ error: "Bad request" });
+  } else {
+    Bar.findAll()
+      .then((bars) => {
+        res.json(bars);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
+  }
 };
 
 barController.create = (req, res) => {
@@ -26,7 +40,7 @@ barController.create = (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).json(err);
+      res.status(500).json({ errors: err.errors.map((e) => e.message) });
     });
 };
 
@@ -70,6 +84,40 @@ barController.getById = (req, res) => {
         return res.status(404).json({ error: "Bar not found" });
       }
       res.json(bar);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+};
+
+barController.getCommandesByDate = (req, res) => {
+  const { id } = req.params;
+  const { date } = req.query;
+  Bar.findByPk(id, {
+    where: { date: date },
+    include: [Commande],
+  })
+    .then((bar) => {
+      if (!bar) {
+        return res.status(404).json({ error: "Bar not found" });
+      }
+      res.json(bar);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+};
+
+// GET /bars?ville=Paris => Liste des bars d'une ville donnée
+// barRouter.get("/", barController.getByCity);
+barController.getByCity = (req, res) => {
+  const { ville } = req.query;
+  console.log(`ville: ${ville}`);
+  Bar.findAll()
+    .then((bars) => {
+      res.status(200).json(bars.filter((bar) => bar.adresse.includes(ville)));
     })
     .catch((err) => {
       console.log(err);

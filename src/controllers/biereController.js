@@ -27,28 +27,31 @@ biereController.getById = (req, res) => {
 };
 
 biereController.create = (req, res) => {
-  if (!req.form.isValid) {
-    res.status(400).json({ message: "Invalid Form" });
-  }
+  // if (!req.form.isValid) {
+  //   res.status(400).json({ message: "Invalid Form" });
+  // }
 
-  const { name, description, degree, prix } = req.form;
-  const biere = { name, description, degree, prix };
+  const { name, description, degree, prix, barId } = req.body;
+  const biere = { name, description, degree, prix, barId };
 
   Biere.create(biere)
     .then((biere) => {
       return res.status(201).send({ biere, message: "Biere created" });
     })
     .catch((error) => {
-      res.status(400).send({ message: "Failed creating biere", error });
+      res.status(400).send({
+        message: "Failed creating biere",
+        error: error.errors.map((e) => e.message),
+      });
     });
 };
 biereController.update = (req, res) => {
-  if (!req.form.isValid) {
-    res.status(400).json({ message: "Invalid Form" });
-  }
+  // if (!req.form.isValid) {
+  //   res.status(400).json({ message: "Invalid Form" });
+  // }
 
   const id = req.params.id;
-  const { name, description, degree, prix } = req.form;
+  const { name, description, degree, prix } = req.body;
   const biere = { name, description, degree, prix };
 
   Biere.update(biere, { where: { id } })
@@ -64,8 +67,10 @@ biereController.delete = (req, res) => {
   const id = req.params.id;
 
   Biere.destroy({ where: { id } })
-    .then((biere) => {
-      return res.status(200).send({ biere, message: "Biere deleted !" });
+    .then((nbDeleted) => {
+      return res
+        .status(200)
+        .send({ message: `Number of biere deleted : ${nbDeleted}` });
     })
     .catch((error) => {
       res.status(400).send({ message: "Failed deleting biere", error });

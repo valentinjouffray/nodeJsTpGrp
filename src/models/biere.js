@@ -10,7 +10,7 @@ const Biere = db.define("Biere", {
   prix: {
     type: DataTypes.FLOAT,
     allowNull: false,
-    validator: {
+    validate: {
       isFloat: true,
       min: 0,
     },
