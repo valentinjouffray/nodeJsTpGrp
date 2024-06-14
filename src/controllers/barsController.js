@@ -130,38 +130,88 @@ barController.getByCity = (req, res) => {
 //GET /bars/:id_bar/biere?sort=asc => Liste des bières d'un bar triées par ordre alphabétique
 //GET /bars/:id_bar/biere?sort=desc => Liste des bières d'un bar triées par ordre alphabétique inversé
 //GET /bars/:id_bar/biere?sort=asc&limit=10 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10
-barController.getBieresByBarId = (req, res) => {
+//GET /bars/:id_bar/biere?sort=asc&limit=10&offset=5 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10 en commençant à l'index 5
+barController.getBieresByBarId = async (req, res) => {
   const barId = req.params.id_bar;
   const sort = req.query.sort;
-  const limit = parseInt(req.query.limit, 10); 
+  const limit = parseInt(req.query.limit, 10); // Convertit le paramètre limit en entier
+  const offsetId = parseInt(req.query.offset, 10); // Convertit le paramètre offset en entier
 
-  if (sort && sort !== 'asc' && sort !== 'desc') {
-    return res.status(400).json({ message: "Invalid sort parameter. Use 'asc' or 'desc'." });
+  // Validation des paramètres sort limit et offset
+  if (sort && sort !== "asc" && sort !== "desc") {
+    return res
+      .status(400)
+      .json({ message: "Invalid sort parameter. Use 'asc' or 'desc'." });
   }
 
   if (limit && (isNaN(limit) || limit <= 0)) {
-    return res.status(400).json({ message: "Invalid limit parameter. Use a positive integer." });
+    return res
+      .status(400)
+      .json({ message: "Invalid limit parameter. Use a positive integer." });
+  }
+
+  if (offsetId && (isNaN(offsetId) || offsetId <= 0)) {
+    return res
+      .status(400)
+      .json({ message: "Invalid offset parameter. Use a positive integer." });
   }
 
   let orderCondition = [];
 
+  // Ajouter la condition de tri si le paramètre sort est présent
   if (sort) {
-    orderCondition = [['name', sort]];  
+    orderCondition = [["name", sort]];
   }
 
-  const findOptions = { 
+  // Trouver l'index de l'id spécifique si offsetId est fourni
+  let offset = 0;
+  if (offsetId) {
+    try {
+      const offsetBeer = await Biere.findOne({
+        where: {
+          barId: barId,
+          id: { [Op.gte]: offsetId },
+        },
+        order: [["name", sort]],
+      });
+
+      if (offsetBeer) {
+        const allBeers = await Biere.findAll({
+          where: {
+            barId: barId,
+            name: { [Op.lte]: offsetBeer.name },
+          },
+          order: [["name", sort]],
+        });
+        offset = allBeers.findIndex((b) => b.id === offsetId);
+      } else {
+        return res
+          .status(404)
+          .json({
+            message: "No beer found starting from the specified offset ID",
+          });
+      }
+    } catch (error) {
+      return res.status(500).json({
+        message: "Failed to calculate offset for the specified ID",
+        error,
+      });
+    }
+  }
+
+  const findOptions = {
     where: { barId: barId },
-    order: orderCondition
+    order: orderCondition,
+    limit: limit,
+    offset: offset,
   };
-
-  if (limit) {
-    findOptions.limit = limit;
-  }
 
   Biere.findAll(findOptions)
     .then((bieres) => {
       if (bieres.length === 0) {
-        return res.status(404).json({ message: "No biere found for the specified bar" });
+        return res
+          .status(404)
+          .json({ message: "No biere found for the specified bar" });
       }
       res.status(200).json(bieres);
     })
@@ -172,7 +222,6 @@ barController.getBieresByBarId = (req, res) => {
       });
     });
 };
-
 
 //GET /bars/:id_bar/degree => Degré d'alcool moyen des bières d'un bar
 //GET /bars/:id_bar/degree?prix_min=10&prix_max=20 => Degré d'alcool moyen des bières d'un bar avec un prix compris entre 10 et 20
