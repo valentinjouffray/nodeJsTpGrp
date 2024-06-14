@@ -1,5 +1,6 @@
 const Bar = require("../models/bars");
 const Commande = require("../models/commande");
+const Biere = require("../models/biere");
 // const barsIndexMethodFinder = require("../services/barsIndexMethodFinder");
 const barController = {};
 const Biere = require("../models/biere");
@@ -12,8 +13,13 @@ const { Sequelize, Op } = require("sequelize");
 
 barController.getAll = (req, res) => {
   if (Object.keys(req.query).length > 0) {
+    console.log(req.query);
     if (req.query.ville) {
+      console.log("ville");
       barController.getByCity(req, res);
+    } else if (req.query.name) {
+      console.log("name");
+      barController.getByName(req, res);
     } else return res.status(400).json({ error: "Bad request" });
   } else {
     Bar.findAll()
@@ -30,14 +36,21 @@ barController.getAll = (req, res) => {
 barController.getBy = (req, res) => {
   const { query } = req;
   if (query.date) {
+    console.log("date");
     barController.getCommandesByDate(req, res);
+  } else if (req.query.prix_min && req.query.prix_max) {
+    console.log("prix");
+    barController.getCommandeBetweenPrices(req, res);
   } else {
     barController.getCommandesByBar(req, res);
   }
 };
 
 barController.create = (req, res) => {
-  const { name, adresse, tel, email, description } = req.body;
+  if (!req.form.isValid) {
+    return res.status(400).json({ message: "Invalid Form" });
+  }
+  const { name, adresse, tel, email, description } = req.form;
   Bar.create({
     name: name,
     adresse: adresse,
@@ -55,8 +68,11 @@ barController.create = (req, res) => {
 };
 
 barController.update = (req, res) => {
+  if (!req.form.isValid) {
+    return res.status(400).json({ message: "Invalid Form" });
+  }
   const { id } = req.params;
-  const { name, adresse, tel, email, description } = req.body;
+  const { name, adresse, tel, email, description } = req.form;
   const updatedBar = {
     name: name,
     adresse: adresse,
@@ -105,14 +121,20 @@ barController.getCommandesByDate = (req, res) => {
   const { id } = req.params;
   const { date } = req.query;
   Bar.findByPk(id, {
-    where: { date: date },
     include: [Commande],
   })
     .then((bar) => {
       if (!bar) {
         return res.status(404).json({ error: "Bar not found" });
       }
-      res.json(bar.Commandes);
+      const commandes = bar.Commandes.filter((commande) => {
+        new Date(commande.date).getTime() == new Date(date).getTime();
+        console.log(
+          new Date(commande.date).getTime(),
+          new Date(date).getTime()
+        );
+      });
+      res.json(commandes);
     })
     .catch((err) => {
       console.log(err);
@@ -135,11 +157,10 @@ barController.getByCity = (req, res) => {
     });
 };
 
-
 //GET /bars/:id_bar/biere => Liste des bières d'un bar
 //GET /bars/:id_bar/biere?sort=asc => Liste des bières d'un bar triées par ordre alphabétique
 //GET /bars/:id_bar/biere?sort=desc => Liste des bières d'un bar triées par ordre alphabétique inversé
-//GET /bars/:id_bar/biere?sort=asc&limit=10 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10 
+//GET /bars/:id_bar/biere?sort=asc&limit=10 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10
 //GET /bars/:id_bar/biere?sort=asc&limit=10&offset=5 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10 en commençant à l'index 5 PAS TERMINE
 barController.getBieresByBarId = async (req, res) => {
   const barId = req.params.id_bar;
@@ -195,11 +216,9 @@ barController.getBieresByBarId = async (req, res) => {
         });
         offset = allBeers.findIndex((b) => b.id === offsetId);
       } else {
-        return res
-          .status(404)
-          .json({
-            message: "No beer found starting from the specified offset ID",
-          });
+        return res.status(404).json({
+          message: "No beer found starting from the specified offset ID",
+        });
       }
     } catch (error) {
       return res.status(500).json({
@@ -233,9 +252,6 @@ barController.getBieresByBarId = async (req, res) => {
     });
 };
 
-
-
-
 //GET /bars/:id_bar/degree => Degré d'alcool moyen des bières d'un bar
 //GET /bars/:id_bar/degree?prix_min=10&prix_max=20 => Degré d'alcool moyen des bières d'un bar avec un prix compris entre 10 et 20
 //Get /:id_bar/degree?date=2021-01-01
@@ -245,10 +261,20 @@ barController.getAverageDegreeByBarId = async (req, res) => {
   const { date, prix_min: prixMin, prix_max: prixMax } = req.query;
 
   const isValidDate = !date || !isNaN(new Date(date).getTime());
-  const isValidPriceRange = (!prixMin && !prixMax) || (prixMin && prixMax && !isNaN(parseFloat(prixMin)) && !isNaN(parseFloat(prixMax)));
+  const isValidPriceRange =
+    (!prixMin && !prixMax) ||
+    (prixMin &&
+      prixMax &&
+      !isNaN(parseFloat(prixMin)) &&
+      !isNaN(parseFloat(prixMax)));
 
   if (!isValidDate || !isValidPriceRange) {
-    return res.status(400).json({ message: "Invalid query parameters. Use either a valid 'date' or both 'prix_min' and 'prix_max'." });
+    return res
+      .status(400)
+      .json({
+        message:
+          "Invalid query parameters. Use either a valid 'date' or both 'prix_min' and 'prix_max'.",
+      });
   }
 
   const whereCondition = { barId };
@@ -262,14 +288,19 @@ barController.getAverageDegreeByBarId = async (req, res) => {
   }
 
   if (prixMin && prixMax) {
-    whereCondition.prix = { [Op.gte]: parseFloat(prixMin), [Op.lte]: parseFloat(prixMax) };
+    whereCondition.prix = {
+      [Op.gte]: parseFloat(prixMin),
+      [Op.lte]: parseFloat(prixMax),
+    };
   }
 
   try {
     const bieres = await Biere.findAll({ where: whereCondition });
 
     if (bieres.length === 0) {
-      return res.status(404).json({ message: "No biere found for the specified filters" });
+      return res
+        .status(404)
+        .json({ message: "No biere found for the specified filters" });
     }
 
     const totalDegrees = bieres.reduce((acc, biere) => acc + biere.degree, 0);
@@ -277,8 +308,25 @@ barController.getAverageDegreeByBarId = async (req, res) => {
 
     return res.status(200).json({ averageDegree });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to calculate average degree for the specified filters", error });
+    return res
+      .status(500)
+      .json({
+        message: "Failed to calculate average degree for the specified filters",
+        error,
+      });
   }
+};
+
+barController.getByName = (req, res) => {
+  const { name } = req.query;
+  Bar.findAll()
+    .then((bars) => {
+      res.status(200).json(bars.filter((bar) => bar.name.includes(name)));
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 };
 
 barController.getCommandesByBar = (req, res) => {
@@ -296,5 +344,41 @@ barController.getCommandesByBar = (req, res) => {
     });
 };
 
+barController.getAverageDegree = (req, res) => {
+  const { id } = req.params;
+  Bar.findByPk(id, { include: [Biere] })
+    .then((bar) => {
+      if (!bar) {
+        return res.status(404).json({ error: "Bar not found" });
+      }
+      const averageDegree =
+        bar.Bieres.reduce((acc, biere) => acc + biere.degree, 0) /
+        bar.Bieres.length;
+      res.json({ averageDegree });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+};
+
+barController.getCommandeBetweenPrices = (req, res) => {
+  const { id } = req.params;
+  const { prix_min, prix_max } = req.query;
+  Bar.findByPk(id, { include: [Commande] })
+    .then((bar) => {
+      if (!bar) {
+        return res.status(404).json({ error: "Bar not found" });
+      }
+      const commandes = bar.Commandes.filter(
+        (commande) => commande.prix >= prix_min && commande.prix <= prix_max
+      );
+      res.json(commandes);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+};
 
 module.exports = barController;

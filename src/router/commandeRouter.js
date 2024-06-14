@@ -1,11 +1,12 @@
 const commandeController = require("../controllers/commandeController");
+const { commandeForm } = require("../middleware/form");
 
 const express = require("express");
 const commandeRouter = express.Router();
 
 commandeRouter.get("/", commandeController.getAll);
-commandeRouter.post("/", commandeController.create);
-commandeRouter.put("/:id", commandeController.update);
+commandeRouter.post("/", commandeForm, commandeController.create);
+commandeRouter.put("/:id", commandeForm, commandeController.update);
 commandeRouter.delete("/:id", commandeController.delete);
 // GET /commandes/:id => Détail d'une commande d'un bar
 commandeRouter.get("/:id", commandeController.getById);
