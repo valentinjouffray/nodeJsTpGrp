@@ -49,8 +49,8 @@ Création d'une API pour un site de bars qui permet de gérer les bars, les biè
   GET /commandes/:id => Détail d'une commande d'un bar
 
 ### BIERE_COMMANDE :
-  POST /commandes/:id/biere/:id => Ajouter une bière à une commande
-  DELETE /commandes/:id/biere/:id => Supprimer une bière d'une commande
+- [x] POST /commandes/:id/biere/:id => Ajouter une bière à une commande
+- [x] DELETE /commandes/:id/biere/:id => Supprimer une bière d'une commande
   
 ## Liste des endpoints avancés
   GET /bars/:id_bar/commandes?date=2021-01-01 => Liste des commandes d'un bar à une date donnée
