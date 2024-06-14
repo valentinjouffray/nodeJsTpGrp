@@ -10,6 +10,9 @@ barRouter.get("/:id/commandes", barController.getCommandesByDate);
 barRouter.put("/:id", barController.update);
 barRouter.delete("/:id", barController.delete);
 barRouter.get("/:id", barController.getById);
+barRouter.get("/:id_bar/biere", barController.getBieresByBarId);
+barRouter.get("/:id_bar/degree", barController.getAverageDegreeByBarId);
+
 
 // GET /bars/:id_bar/commandes?date=2021-01-01 =>
 // GET /bars?name=example => Liste des bars dont le nom contient "example"

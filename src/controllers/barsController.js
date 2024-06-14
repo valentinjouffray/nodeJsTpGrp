@@ -2,7 +2,7 @@ const Bar = require("../models/bars");
 const Commande = require("../models/commande");
 // const barsIndexMethodFinder = require("../services/barsIndexMethodFinder");
 const barController = {};
-
+const Biere = require("../models/biere");
 // barController.index = (req, res) => {
 //   const { query } = req;
 //   const indexMethod = barsIndexMethodFinder(query);
@@ -122,6 +122,42 @@ barController.getByCity = (req, res) => {
     .catch((err) => {
       console.log(err);
       res.status(500).json(err);
+    });
+};
+
+// GET /bars/:id_bar/biere => Liste des bières d'un bar
+barController.getBieresByBarId = (req, res) => {
+  const barId = req.params.id_bar;
+
+  Biere.findAll({ where: { barId: barId } })
+    .then((bieres) => {
+      if (bieres.length === 0) {
+        return res.status(404).json({ message: "No beers found for the specified bar" });
+      }
+      res.status(200).json(bieres);
+    })
+    .catch((error) => {
+      res.status(500).json({ message: "Failed to fetch beers for the specified bar", error });
+    });
+};
+
+//GET /bars/:id_bar/degree => Degré d'alcool moyen des bières d'un bar
+barController.getAverageDegreeByBarId = (req, res) => {
+  const barId = req.params.id_bar;
+
+  Biere.findAll({ where: { barId: barId } })
+    .then((bieres) => {
+      if (bieres.length === 0) {
+        return res.status(404).json({ message: "No beers found for the specified bar" });
+      }
+
+      const totalDegrees = bieres.reduce((acc, biere) => acc + biere.degree, 0);
+      const averageDegree = totalDegrees / bieres.length;
+
+      res.status(200).json({ averageDegree: averageDegree });
+    })
+    .catch((error) => {
+      res.status(500).json({ message: "Failed to calculate average degree for the specified bar", error });
     });
 };
 
