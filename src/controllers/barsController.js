@@ -126,33 +126,42 @@ barController.getByCity = (req, res) => {
     });
 };
 
-// GET /bars/:id_bar/biere => Liste des bières d'un bar
+//GET /bars/:id_bar/biere => Liste des bières d'un bar
 //GET /bars/:id_bar/biere?sort=asc => Liste des bières d'un bar triées par ordre alphabétique
+//GET /bars/:id_bar/biere?sort=desc => Liste des bières d'un bar triées par ordre alphabétique inversé
+//GET /bars/:id_bar/biere?sort=asc&limit=10 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10
 barController.getBieresByBarId = (req, res) => {
   const barId = req.params.id_bar;
   const sort = req.query.sort;
+  const limit = parseInt(req.query.limit, 10); 
 
-  if (sort && sort !== "asc" && sort !== "desc") {
-    return res
-      .status(400)
-      .json({ message: "Invalid sort parameter. Use 'asc' or 'desc'." });
+  if (sort && sort !== 'asc' && sort !== 'desc') {
+    return res.status(400).json({ message: "Invalid sort parameter. Use 'asc' or 'desc'." });
+  }
+
+  if (limit && (isNaN(limit) || limit <= 0)) {
+    return res.status(400).json({ message: "Invalid limit parameter. Use a positive integer." });
   }
 
   let orderCondition = [];
 
   if (sort) {
-    orderCondition = [["name", sort]];
+    orderCondition = [['name', sort]];  
   }
 
-  Biere.findAll({
+  const findOptions = { 
     where: { barId: barId },
-    order: orderCondition,
-  })
+    order: orderCondition
+  };
+
+  if (limit) {
+    findOptions.limit = limit;
+  }
+
+  Biere.findAll(findOptions)
     .then((bieres) => {
       if (bieres.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "No biere found for the specified bar" });
+        return res.status(404).json({ message: "No biere found for the specified bar" });
       }
       res.status(200).json(bieres);
     })
@@ -163,6 +172,7 @@ barController.getBieresByBarId = (req, res) => {
       });
     });
 };
+
 
 //GET /bars/:id_bar/degree => Degré d'alcool moyen des bières d'un bar
 //GET /bars/:id_bar/degree?prix_min=10&prix_max=20 => Degré d'alcool moyen des bières d'un bar avec un prix compris entre 10 et 20

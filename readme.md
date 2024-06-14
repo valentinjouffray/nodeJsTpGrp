@@ -49,8 +49,8 @@ Création d'une API pour un site de bars qui permet de gérer les bars, les biè
   GET /commandes/:id => Détail d'une commande d'un bar
 
 ### BIERE_COMMANDE :
-  POST /commandes/:id/biere/:id => Ajouter une bière à une commande
-  DELETE /commandes/:id/biere/:id => Supprimer une bière d'une commande
+- [x]  POST /commandes/:id/biere/:id => Ajouter une bière à une commande
+- [x]  DELETE /commandes/:id/biere/:id => Supprimer une bière d'une commande
   
 ## Liste des endpoints avancés
 - [ ] GET /bars/:id_bar/commandes?date=2021-01-01 => Liste des commandes d'un bar à une date donnée
@@ -116,7 +116,7 @@ package.json
 - [ ] GET /bars/:id_bar/commandes?date=2021-01-01&prix_min=10&prix_max=20&status=terminée&name=example => Liste des commandes d'un bar à une date donnée avec un prix compris entre 10 et 20 et terminée et dont le nom contient "example"
 - [x] GET /bars/:id_bar/biere?sort=asc => Liste des bières d'un bar triées par ordre alphabétique  
 - [x] GET /bars/:id_bar/biere?sort=desc => Liste des bières d'un bar triées par ordre alphabétique inversé
-- [ ] GET /bars/:id_bar/biere?sort=asc&limit=10 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10
+- [x] GET /bars/:id_bar/biere?sort=asc&limit=10 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10
 - [ ] GET /bars/:id_bar/biere?sort=asc&limit=10&offset=5 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10 en commençant à l'index 5
 - [ ] GET /bars/:id_bar/biere?sort=asc&limit=10&offset=5&degree_min=5&degree_max=10 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10 en commençant à l'index 5 avec un degré d'alcool compris entre 5 et 10
 - [ ] GET /bars/:id_bar/biere?sort=asc&limit=10&offset=5&degree_min=5&degree_max=10&prix_min=10&prix_max=20 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10 en commençant à l'index 5 avec un degré d'alcool compris entre 5 et 10 et un prix compris entre 10 et 20 (amusez-vous bien)
