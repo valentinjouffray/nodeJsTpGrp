@@ -10,7 +10,7 @@ const barController = {};
 // };
 
 barController.getAll = (req, res) => {
-  if (req.query) {
+  if (Object.keys(req.query).length > 0) {
     if (req.query.ville) {
       barController.getByCity(req, res);
     } else return res.status(400).json({ error: "Bad request" });

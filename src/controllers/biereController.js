@@ -1,4 +1,4 @@
-const Biere = require("../models/biere");
+const { Biere } = require("../models/models");
 const biereController = {};
 
 biereController.getAll = (req, res) => {
@@ -7,7 +7,7 @@ biereController.getAll = (req, res) => {
       return res.send(bieres);
     })
     .catch((error) => {
-      res.status(400).send({ message: "Failed fetching bieres", error });
+      res.status(400).send({ error: "Failed fetching bieres", error });
     });
 };
 
@@ -17,12 +17,12 @@ biereController.getById = (req, res) => {
   Biere.findByPk(id)
     .then((biere) => {
       if (!biere) {
-        return res.send({ message: "Biere not found" });
+        return res.send({ error: "Biere not found" });
       }
       return res.status(200).send(biere);
     })
     .catch((error) => {
-      res.status(400).send({ message: "Failed fetching biere", error });
+      res.status(400).send({ error: "Failed fetching biere", error });
     });
 };
 
@@ -40,11 +40,12 @@ biereController.create = (req, res) => {
     })
     .catch((error) => {
       res.status(400).send({
-        message: "Failed creating biere",
-        error: error.errors.map((e) => e.message),
+        error: "Failed creating biere",
+        errors: error.errors ? error.errors.map((e) => e.message) : error.name,
       });
     });
 };
+
 biereController.update = (req, res) => {
   // if (!req.form.isValid) {
   //   res.status(400).json({ message: "Invalid Form" });
@@ -56,10 +57,13 @@ biereController.update = (req, res) => {
 
   Biere.update(biere, { where: { id } })
     .then((biere) => {
+      if (biere[0] === 0) {
+        return res.status(200).send({ error: "Biere not found" });
+      }
       return res.status(200).send({ biere, message: "Biere updated !" });
     })
     .catch((error) => {
-      res.status(400).send({ message: "Failed updating biere", error });
+      res.status(400).send({ error: "Failed updating biere", error });
     });
 };
 
@@ -73,7 +77,7 @@ biereController.delete = (req, res) => {
         .send({ message: `Number of biere deleted : ${nbDeleted}` });
     })
     .catch((error) => {
-      res.status(400).send({ message: "Failed deleting biere", error });
+      res.status(400).send({ error: "Failed deleting biere", error });
     });
 };
 
