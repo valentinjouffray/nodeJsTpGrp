@@ -5,6 +5,7 @@ const db = new sequelize({
   storage: process.env.DB_DRIVER || "db.sqlite",
 });
 
-db.sync();
+// Supprime et recrée la base de données à chaque redémarrage
+db.sync({ force: true });
 
 module.exports = db;
