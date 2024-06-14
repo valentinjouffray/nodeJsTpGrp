@@ -3,7 +3,6 @@ const Commande = require("../models/commande");
 const Biere = require("../models/biere");
 // const barsIndexMethodFinder = require("../services/barsIndexMethodFinder");
 const barController = {};
-const Biere = require("../models/biere");
 const { Sequelize, Op } = require("sequelize");
 // barController.index = (req, res) => {
 //   const { query } = req;
