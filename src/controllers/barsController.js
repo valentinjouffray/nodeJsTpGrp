@@ -26,6 +26,15 @@ barController.getAll = (req, res) => {
   }
 };
 
+barController.getBy = (req, res) => {
+  const { query } = req;
+  if (query.date) {
+    barController.getCommandesByDate(req, res);
+  } else {
+    barController.getCommandesByBar(req, res);
+  }
+};
+
 barController.create = (req, res) => {
   const { name, adresse, tel, email, description } = req.body;
   Bar.create({
@@ -102,7 +111,7 @@ barController.getCommandesByDate = (req, res) => {
       if (!bar) {
         return res.status(404).json({ error: "Bar not found" });
       }
-      res.json(bar);
+      res.json(bar.Commandes);
     })
     .catch((err) => {
       console.log(err);
@@ -114,10 +123,25 @@ barController.getCommandesByDate = (req, res) => {
 // barRouter.get("/", barController.getByCity);
 barController.getByCity = (req, res) => {
   const { ville } = req.query;
-  console.log(`ville: ${ville}`);
+  // console.log(`ville: ${ville}`);
   Bar.findAll()
     .then((bars) => {
       res.status(200).json(bars.filter((bar) => bar.adresse.includes(ville)));
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+};
+
+barController.getCommandesByBar = (req, res) => {
+  const { id } = req.params;
+  Bar.findByPk(id, { include: [Commande] })
+    .then((bar) => {
+      if (!bar) {
+        return res.status(404).json({ error: "Bar not found" });
+      }
+      res.json(bar.Commandes);
     })
     .catch((err) => {
       console.log(err);

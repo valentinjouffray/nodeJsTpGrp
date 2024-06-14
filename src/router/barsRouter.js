@@ -5,8 +5,9 @@ const barRouter = express.Router();
 
 barRouter.get("/", barController.getAll);
 barRouter.post("/", barController.create);
-//  Liste des commandes d'un bar à une date donnée
-barRouter.get("/:id/commandes", barController.getCommandesByDate);
+// GET /bars/:id/commandes?date=2021-01-01 => Liste des commandes d'un bar à une date donnée
+// GET /bars/:id/commandes => Liste des commandes d'un bar
+barRouter.get("/:id/commandes", barController.getBy);
 barRouter.put("/:id", barController.update);
 barRouter.delete("/:id", barController.delete);
 barRouter.get("/:id", barController.getById);
