@@ -29,11 +29,11 @@ Création d'une API pour un site de bars qui permet de gérer les bars, les biè
 
 ## Liste des endpoints
 ### BARS :
-  POST /bars => Ajouter un bar
-  PUT /bars/:id_bar => Modifier un bar
-  DELETE /bars/:id_bar => Supprimer un bar
-  GET /bars => Liste des bars
-  GET /bars/:id_bar => Détail d'un bar
+- [x] POST /bars => Ajouter un bar
+- [x]  PUT /bars/:id_bar => Modifier un bar
+- [x]  DELETE /bars/:id_bar => Supprimer un bar
+- [ ]  GET /bars => Liste des bars
+- [x]  GET /bars/:id_bar => Détail d'un bar
 
 ### BIERE :
 - [x] POST /bars/:id_bar/biere => Ajouter une bière à un bar
@@ -42,11 +42,11 @@ Création d'une API pour un site de bars qui permet de gérer les bars, les biè
 - [x]  GET /bars/:id_bar/biere => Liste des bières d'un bar
 - [x]  GET /biere/:id_biere => Détail d'une bière
 ### COMMANDE :  
-  POST /bars/:id_bar/commandes => Ajouter une commande à un bar
-  PUT /commandes/:id_commande => Modifier une commande d'un bar
-  DELETE /commandes/:id_commande => Supprimer une commande d'un bar
-  GET /bars/:id_bar/commandes => Liste des commandes d'un bar
-  GET /commandes/:id => Détail d'une commande d'un bar
+- [x]  POST /bars/:id_bar/commandes => Ajouter une commande à un bar
+- [x]  PUT /commandes/:id_commande => Modifier une commande d'un bar
+- [x]  DELETE /commandes/:id_commande => Supprimer une commande d'un bar
+- [x] GET /bars/:id_bar/commandes => Liste des commandes d'un bar
+- [x]  GET /commandes/:id => Détail d'une commande d'un bar
 
 ### BIERE_COMMANDE :
 - [x]  POST /commandes/:id/biere/:id => Ajouter une bière à une commande

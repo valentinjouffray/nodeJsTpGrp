@@ -130,7 +130,6 @@ barController.getByCity = (req, res) => {
 //GET /bars/:id_bar/biere?sort=asc => Liste des bières d'un bar triées par ordre alphabétique
 //GET /bars/:id_bar/biere?sort=desc => Liste des bières d'un bar triées par ordre alphabétique inversé
 //GET /bars/:id_bar/biere?sort=asc&limit=10 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10
-//GET /bars/:id_bar/biere?sort=asc&limit=10&offset=5 => Liste des bières d'un bar triées par ordre alphabétique et limitées à 10 en commençant à l'index 5
 barController.getBieresByBarId = async (req, res) => {
   const barId = req.params.id_bar;
   const sort = req.query.sort;
@@ -223,72 +222,52 @@ barController.getBieresByBarId = async (req, res) => {
     });
 };
 
+
+
+
 //GET /bars/:id_bar/degree => Degré d'alcool moyen des bières d'un bar
 //GET /bars/:id_bar/degree?prix_min=10&prix_max=20 => Degré d'alcool moyen des bières d'un bar avec un prix compris entre 10 et 20
 //Get /:id_bar/degree?date=2021-01-01
+barController.getAverageDegreeByBarId = async (req, res) => {
+  const { id_bar: barId } = req.params;
+  const { date, prix_min: prixMin, prix_max: prixMax } = req.query;
 
-barController.getAverageDegreeByBarId = (req, res) => {
-  const barId = req.params.id_bar;
-  const date = req.query.date;
-  const prixMin = req.query.prix_min;
-  const prixMax = req.query.prix_max;
+  const isValidDate = !date || !isNaN(new Date(date).getTime());
+  const isValidPriceRange = (!prixMin && !prixMax) || (prixMin && prixMax && !isNaN(parseFloat(prixMin)) && !isNaN(parseFloat(prixMax)));
 
-  // Validation des paramètres de requête
-  const isValidDate = date && !isNaN(new Date(date).getTime());
-  const isValidPriceRange =
-    prixMin &&
-    prixMax &&
-    !isNaN(parseFloat(prixMin)) &&
-    !isNaN(parseFloat(prixMax));
-
-  if (!isValidDate && !isValidPriceRange) {
-    return res.status(400).json({
-      message:
-        "Invalid query parameters. Use either 'date' or both 'prix_min' and 'prix_max'.",
-    });
+  if (!isValidDate || !isValidPriceRange) {
+    return res.status(400).json({ message: "Invalid query parameters. Use either a valid 'date' or both 'prix_min' and 'prix_max'." });
   }
 
-  let whereCondition = { barId: barId };
+  const whereCondition = { barId };
 
-  // Ajouter le filtre de date
-  if (isValidDate) {
+  if (date) {
     const startDate = new Date(date);
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 1);
 
-    whereCondition.createdAt = {
-      [Op.gte]: startDate,
-      [Op.lt]: endDate,
-    };
+    whereCondition.createdAt = { [Op.gte]: startDate, [Op.lt]: endDate };
   }
 
-  // Ajouter les filtres de prix
-  if (isValidPriceRange) {
-    whereCondition.prix = {
-      [Op.gte]: parseFloat(prixMin),
-      [Op.lte]: parseFloat(prixMax),
-    };
+  if (prixMin && prixMax) {
+    whereCondition.prix = { [Op.gte]: parseFloat(prixMin), [Op.lte]: parseFloat(prixMax) };
   }
 
-  Biere.findAll({ where: whereCondition })
-    .then((bieres) => {
-      if (bieres.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "No biere found for the specified date" });
-      }
+  try {
+    const bieres = await Biere.findAll({ where: whereCondition });
 
-      const totalDegrees = bieres.reduce((acc, biere) => acc + biere.degree, 0);
-      const averageDegree = totalDegrees / bieres.length;
+    if (bieres.length === 0) {
+      return res.status(404).json({ message: "No biere found for the specified filters" });
+    }
 
-      res.status(200).json({ averageDegree: averageDegree });
-    })
-    .catch((error) => {
-      res.status(500).json({
-        message: "Failed to calculate average degree for the specified filters",
-        error,
-      });
-    });
+    const totalDegrees = bieres.reduce((acc, biere) => acc + biere.degree, 0);
+    const averageDegree = totalDegrees / bieres.length;
+
+    return res.status(200).json({ averageDegree });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to calculate average degree for the specified filters", error });
+  }
 };
+
 
 module.exports = barController;
